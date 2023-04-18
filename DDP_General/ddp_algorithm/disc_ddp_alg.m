@@ -1,8 +1,8 @@
 function [x, u, J, lambda, dlambda, alpha, k_u, K_u, ii, iter_succ, total_cost] =...
     disc_ddp_alg(ddp_2nd_order, f_dyn, run_cost, term_cost, ddp_par, ubar, xbar, opt_par);
 
-    % first order discrete ddp (iLQR) without constraints
-    % regularization part is by Yuichiro Aoyama
+    % First order discrete ddp (iLQR) without constraints
+    % Regularization part is by Yuichiro Aoyama
     dt = ddp_par.dt; N = ddp_par.N; n = ddp_par.n; m = ddp_par.m; 
     x0 = ddp_par.x0; xf = ddp_par.xf;
     iter = opt_par.iter; toler = opt_par.toler; lambda = opt_par.lambda;
@@ -30,8 +30,8 @@ function [x, u, J, lambda, dlambda, alpha, k_u, K_u, ii, iter_succ, total_cost] 
         % Backward pass: from N to 1; for N:
         
         % Get V,Vx,Vxx
-        [L_f,L_f_x,L_f_xx] = term_cost(xbar(:,end),true);
-        V_plus = L_f; Vx_plus=L_f_x; Vxx_plus=L_f_xx;
+        [L_f, L_f_x, L_f_xx] = term_cost(xbar(:,end), true);
+        V_plus = L_f; Vx_plus = L_f_x; Vxx_plus = L_f_xx;
         
         % Initialize ff gain and fb gain
         k_u = zeros(m,N); % ff gain
@@ -90,11 +90,11 @@ function [x, u, J, lambda, dlambda, alpha, k_u, K_u, ii, iter_succ, total_cost] 
         for alpha = alpha0 
             % Forward propagation
             L = 0;
-            for jj=1:N -1
+            for jj = 1:N-1
                 deltau = alpha*k_u(:,jj) + K_u(:,:,jj)*deltax;
                 u(:,jj) = ubar(:,jj) + deltau;
-                x(:,jj + 1) =  f_dyn.f(x(:,jj),u(:,jj));          
-                deltax = x(:,jj + 1) - xbar(:,jj + 1);  
+                x(:,jj + 1) = f_dyn.f(x(:,jj),u(:,jj));
+                deltax = x(:,jj + 1) - xbar(:,jj + 1);
                 L = L + run_cost(x(:,jj),u(:,jj),false);
             end
             L_f = term_cost(x(:,end),true);
